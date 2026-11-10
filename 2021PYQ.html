@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bihar Board 12th Biology PYQ (2021) - Complete</title>
+    <style>
+        /* --- NEOMORPHIC & GLASSMORPHISM STYLES --- */
+        * { 
+            box-sizing: border-box; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0;
+            padding: 0;
+        }
+
+        body { 
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            min-height: 100vh;
+            display: flex; 
+            justify-content: center; 
+            padding: 20px;
+            color: #333;
+        }
+
+        .container { 
+            background: rgba(255, 255, 255, 0.35);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            max-width: 900px; 
+            width: 100%; 
+            padding: 40px; 
+            border-radius: 20px; 
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+            position: relative;
+        }
+        
+        h1, h2, h3 { text-align: center; color: #1a1a2e; margin-bottom: 20px;}
+        
+        .section { display: none; }
+        .active-section { display: block; animation: fadeIn 0.5s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Inputs & Buttons */
+        input[type="text"], input[type="password"] { 
+            width: 100%; 
+            padding: 15px; 
+            margin: 15px 0; 
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 12px; 
+            font-size: 16px; 
+            outline: none;
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05);
+            transition: 0.3s;
+        }
+        input[type="text"]:focus, input[type="password"]:focus {
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.1), 0 0 10px rgba(255,255,255,0.5);
+        }
+
+        button { 
+            width: 100%; 
+            padding: 15px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            border: none; 
+            border-radius: 12px; 
+            font-size: 18px; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            font-weight: bold; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            margin-top: 15px;
+        }
+        button:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Quiz Options */
+        .question-box { 
+            margin-bottom: 25px; 
+            padding: 20px; 
+            border-radius: 15px; 
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .question-text { font-weight: 700; margin-bottom: 15px; font-size: 17px; color: #1a1a2e; }
+        
+        .option { 
+            display: block; 
+            margin: 10px 0; 
+            padding: 15px; 
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 10px; 
+            cursor: pointer; 
+            transition: all 0.3s ease;
+            font-size: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .option:hover:not(.locked) { 
+            background: rgba(255, 255, 255, 0.9);
+            transform: scale(1.01);
+        }
+
+        /* Instant Feedback Colors */
+        .option.correct-ans {
+            background: rgba(40, 167, 69, 0.85) !important;
+            color: white;
+            border-color: #28a745;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(40, 167, 69, 0.4);
+        }
+        .option.wrong-ans {
+            background: rgba(220, 53, 69, 0.85) !important;
+            color: white;
+            border-color: #dc3545;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(220, 53, 69, 0.4);
+        }
+        .option.locked {
+            cursor: not-allowed;
+        }
+
+        /* Instant Reason Box */
+        .instant-reason {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.8);
+            border-left: 5px solid #ffc107;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #333;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Results */
+        .result-box { margin-bottom: 20px; padding: 20px; border-radius: 10px; background: rgba(255, 255, 255, 0.5); border: 1px solid rgba(255,255,255,0.8); }
+        .result-box.correct { border-left: 6px solid #28a745; }
+        .result-box.incorrect { border-left: 6px solid #dc3545; }
+        
+        /* Long Answers Box */
+        .long-ans-box { margin-top: 30px; padding: 25px; background: rgba(255, 243, 205, 0.6); border-radius: 15px; border: 1px solid rgba(255, 230, 156, 0.8); backdrop-filter: blur(5px); }
+        .long-ans-box h3 { text-align: left; border-bottom: 2px solid #ffc107; padding-bottom: 10px; margin-bottom: 15px; color: #856404; }
+        
+        /* Accordion Styles */
+        details { margin-bottom: 12px; background: rgba(255,255,255,0.5); border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.8); }
+        summary { padding: 15px; font-weight: bold; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; color: #0056b3; }
+        summary::-webkit-details-marker { display: none; }
+        summary::after { content: '+'; font-size: 20px; color: #764ba2; }
+        details[open] summary::after { content: '-'; }
+        .ans-content { padding: 15px; border-top: 1px solid rgba(0,0,0,0.05); font-size: 15px; line-height: 1.6; color: #333; background: rgba(255,255,255,0.7); }
+
+        /* Rank List */
+        .rank-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: rgba(255,255,255,0.4); border-radius: 10px; overflow: hidden; }
+        .rank-table th, .rank-table td { padding: 15px; border-bottom: 1px solid rgba(0,0,0,0.1); text-align: left; }
+        .rank-table th { background-color: rgba(102, 126, 234, 0.8); color: white; }
+        
+        .nav-links { text-align: center; margin-top: 25px; }
+        .nav-links span { color: #764ba2; cursor: pointer; font-weight: bold; text-decoration: underline; }
+
+        /* Scroll to top */
+        #scrollTopBtn {
+            display: none; position: fixed; bottom: 30px; right: 30px; z-index: 99;
+            font-size: 20px; border: none; outline: none; background: #764ba2; color: white;
+            cursor: pointer; padding: 15px; border-radius: 50%; width: 50px; height: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            display: flex; justify-content: center; align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+<button onclick="topFunction()" id="scrollTopBtn" title="Go to top">↑</button>
+
+<div class="container">
+    
+    <!-- 1. Login Section -->
+    <div id="login-section" class="section active-section">
+        <h1>Bihar Board 12th Biology (2021)</h1>
+        <p style="text-align: center; margin-bottom: 20px;">Complete Practice Test (70 MCQs + Subjective)</p>
+        <input type="text" id="studentName" placeholder="Enter your Name to Start">
+        <button onclick="startTest()">Start Test</button>
+        <div class="nav-links">
+            <span onclick="showRankListPrompt()">🔒 View List (Admin)</span>
+        </div>
+    </div>
+
+    <!-- 2. Quiz Section -->
+    <div id="quiz-section" class="section">
+        <h2>Biology Objective Test</h2>
+        <p style="text-align: center; color: #444; margin-bottom: 20px; font-size: 14px;">
+            Click on an option to see the result instantly. You can submit the test at any time.
+        </p>
+        <div id="questions-container"></div>
+        <button id="submit-btn" class="submit-btn" onclick="submitTest()">Submit Test & Save Score</button>
+    </div>
+
+    <!-- 3. Result Section -->
+    <div id="result-section" class="section">
+        <h2 id="score-display" style="font-size: 28px; color: #1a1a2e;"></h2>
+        <h3>Detailed Analysis & Explanations</h3>
+        <div id="review-container"></div>
+        
+        <div class="long-ans-box">
+            <h3>Section B: Subjective Questions & Answers</h3>
+            
+            <!-- Short Answer Questions -->
+            <h4 style="color: #333; margin-bottom: 10px;">Short Answer Questions (2 Marks)</h4>
+            
+            <details>
+                <summary>Q1. जीएमओ पर प्रकाश डालें। (Throw light on GMOs)</summary>
+                <div class="ans-content">Genetically Modified Organisms (GMOs) are plants, animals, or microorganisms whose genetic material has been altered using genetic engineering techniques to introduce desired traits. E.g., Bt Cotton.</div>
+            </details>
+            
+            <details>
+                <summary>Q2. मानव अंडाशय के अनुप्रस्थ काट का चित्र बनाएँ। (Draw TS of human ovary)</summary>
+                <div class="ans-content">A labelled diagram showing Germinal epithelium (outer layer), Tunica albuginea, Stroma, Primary follicles, Secondary follicles, and Mature Graafian follicle.</div>
+            </details>
+
+            <details>
+                <summary>Q3. अमीबियासिस क्या है? (What is Amoebiasis?)</summary>
+                <div class="ans-content">Amoebiasis is an intestinal infection caused by the protozoan parasite <i>Entamoeba histolytica</i>. Symptoms include abdominal pain, severe diarrhea (often with blood and mucus), and cramps.</div>
+            </details>
+
+            <details>
+                <summary>Q4. एलर्जी क्या है? (What is Allergy?)</summary>
+                <div class="ans-content">Allergy is the exaggerated/hypersensitive response of the immune system to certain harmless foreign substances (allergens). Symptoms include sneezing, watery eyes, runny nose, skin rashes, and difficulty breathing.</div>
+            </details>
+
+            <details>
+                <summary>Q5. प्रतिरक्षी का चित्र बनाएँ। (Draw diagram of primary antibody)</summary>
+                <div class="ans-content">A Y-shaped structure showing two heavy (H) chains and two light (L) chains connected by disulfide bonds. It has variable regions at the tips for antigen binding and a constant region at the base.</div>
+            </details>
+
+            <details>
+                <summary>Q6. जैव-विविधता हॉटस्पॉट क्या है? (What is a biodiversity hotspot?)</summary>
+                <div class="ans-content">A biogeographic region with a significant reservoir of biodiversity that is under threat from humans. Two hotspots in India are: 1. Western Ghats, 2. Eastern Himalayas. Features: High endemism and high species richness.</div>
+            </details>
+
+            <details>
+                <summary>Q7. रक्त के कार्यों को लिखें। (Write functions of blood)</summary>
+                <div class="ans-content">1. Transport of oxygen, nutrients, and hormones to cells. 2. Transport of waste products (CO2, urea) to excretory organs. 3. Regulation of body temperature and pH. 4. Protection against infections via WBCs.</div>
+            </details>
+
+            <details>
+                <summary>Q8. ग्लोबल वार्मिंग क्या है? (What is global warming?)</summary>
+                <div class="ans-content">Global warming is the long-term heating of Earth's climate system due to human activities, primarily fossil fuel burning, which increases heat-trapping greenhouse gas levels. Effects include melting glaciers, rising sea levels, and extreme weather events.</div>
+            </details>
+
+            <details>
+                <summary>Q9. अंत: प्रजनन क्या है? (What is internal fertilization?)</summary>
+                <div class="ans-content">Internal fertilization is the union of an egg and sperm cell during sexual reproduction inside the female body. Example: Humans, reptiles, birds.</div>
+            </details>
+
+            <details>
+                <summary>Q10. क्लाइनफेल्टर सिंड्रोम पर प्रकाश डालें। (Klinefelter syndrome)</summary>
+                <div class="ans-content">A genetic condition in males where they have an extra X chromosome (47, XXY). Symptoms include tall stature, reduced muscle mass, enlarged breasts (gynecomastia), small testicles, and infertility.</div>
+            </details>
+
+            <details>
+                <summary>Q11. परखनली शिशु किसे कहते हैं? (What is a test-tube baby?)</summary>
+                <div class="ans-content">A test-tube baby is a baby conceived through In Vitro Fertilization (IVF), a process where an egg is fertilized by sperm outside the body in a laboratory dish, and the resulting embryo is then implanted into the uterus.</div>
+            </details>
+
+            <details>
+                <summary>Q12. मरुस्थलीय पौधों के अनुकूलन (Desert plant adaptations)</summary>
+                <div class="ans-content">Desert plants (Xerophytes) have: 1. Thick cuticle to prevent water loss. 2. Sunken stomata. 3. Leaves reduced to spines (e.g., cactus). 4. Fleshy stems for water storage. 5. Deep roots to absorb water.</div>
+            </details>
+
+            <details>
+                <summary>Q13. अल्कोहल के दुष्परिणामों का वर्णन करें। (Ill effects of alcohol)</summary>
+                <div class="ans-content">Alcohol consumption leads to liver cirrhosis, brain damage (impaired coordination, memory loss), addiction, stomach ulcers, and social/economic ruin of the individual and family.</div>
+            </details>
+
+            <details>
+                <summary>Q14. अंतर्जात प्रतिरक्षा पर प्रकाश डालें। (Innate immunity)</summary>
+                <div class="ans-content">The specific resistance present from birth that prevents the entry of pathogens into our body is called innate immunity. It has four types: (i) Physical barrier, (ii) Physiological barrier, (iii) Cellular barrier, (iv) Cytokine barrier.</div>
+            </details>
+
+            <details>
+                <summary>Q15. संक्षेप में ट्रांसक्रिप्शन का वर्णन करें। (Describe transcription)</summary>
+                <div class="ans-content">Copying of genetic information from one strand of DNA into mRNA is called transcription. In eukaryotic cells, it occurs in the nucleus, where adenosine and uridine pair with thymine and guanine of the DNA template.</div>
+            </details>
+
+            <details>
+                <summary>Q16. बायोपाइरेसी का संक्षिप्त विवरण (Biopiracy)</summary>
+                <div class="ans-content">Using biological resources without the proper authorization or compensation of the nation or related people is called biopiracy. It is often done by multinational companies or organizations.</div>
+            </details>
+
+            <details>
+                <summary>Q17. मेंडल की सफलता के कारण (Reasons for Mendel's success)</summary>
+                <div class="ans-content">(i) Pea seeds were easily available. (ii) Pea flowers are bisexual, allowing easy self-pollination. (iii) The plant is small and easy to grow. (iv) The characters of the pea plant are clearly visible, making observation easy.</div>
+            </details>
+
+            <details>
+                <summary>Q18. युग्मन और प्रतिकर्षण को परिभाषित करें। (Coupling and Repulsion)</summary>
+                <div class="ans-content"><b>Coupling:</b> When two dominant alleles or two recessive alleles come from the same parent and stay together. <b>Repulsion:</b> When two dominant alleles or two recessive alleles come from different parents and remain separate.</div>
+            </details>
+
+            <details>
+                <summary>Q19. DNA प्रतिकृति के लिए आवश्यक दो एन्जाइम (Enzymes for DNA replication)</summary>
+                <div class="ans-content">(i) <b>DNA Polymerase:</b> Catalyzes the polymerization of deoxyribonucleotides using a DNA template. (ii) <b>DNA Ligase:</b> Joins the DNA fragments together.</div>
+            </details>
+
+            <details>
+                <summary>Q20. सूक्ष्मप्रवर्धन क्या है? (What is micropropagation?)</summary>
+                <div class="ans-content">The method of producing thousands of plants from a small amount of tissue through tissue culture is called micropropagation. <b>Advantage:</b> Plants with desired genetic traits can be obtained in a very short time.</div>
+            </details>
+
+            <!-- Long Answer Questions -->
+            <h4 style="color: #333; margin: 20px 0 10px 0;">Long Answer Questions (5 Marks)</h4>
+
+            <details>
+                <summary>Q21. ऊतक संवर्धन पर एक निबंध लिखें। (Essay on Tissue Culture)</summary>
+                <div class="ans-content">When a new plant is produced from a specific part of a plant (root, stem, leaf) in a controlled medium, it is called tissue culture. It requires controlled light, temperature, humidity, and pH. It is based on the principle of <i>Totipotency</i>. Initially, coconut water or yeast extract was used as a medium, but now a special nutrient solution is used. Three main pathways are: (i) By apical meristem (produces virus-free plants), (ii) By adventitious bud, (iii) By adventive embryony.</div>
+            </details>
+
+            <details>
+                <summary>Q22. पुष्पीय पौधों में निषेचन की क्रिया (Fertilization in plants)</summary>
+                <div class="ans-content">The union of male and female gametes is called fertilization. In angiosperms, this occurs through double fertilization. The pollen tube enters the ovule and discharges two male gametes. One fuses with the egg to form the zygote (syngamy), and the other fuses with the two polar nuclei to form the endosperm (triple fusion).</div>
+            </details>
+
+            <details>
+                <summary>Q23. रिकॉम्बिनेंट डीएनए तकनीक (Recombinant DNA technique)</summary>
+                <div class="ans-content">Recombinant DNA technology involves manipulating genetic material to create new combinations of genes. It requires restriction enzymes (to cut DNA), a vector (to carry DNA), ligase (to join DNA), and a host organism. It is used in gene mapping, developmental studies, antisense therapy, and producing GMOs.</div>
+            </details>
+
+            <details>
+                <summary>Q24. तीन पारिस्थितिक पिरामिडों का वर्णन (Ecological Pyramids)</summary>
+                <div class="ans-content">1. <b>Pyramid of Numbers:</b> Shows the number of individuals at each trophic level. (Upright in grassland, inverted in a tree ecosystem). 2. <b>Pyramid of Biomass:</b> Shows the total dry weight of organisms at each level. (Upright in terrestrial, inverted in aquatic). 3. <b>Pyramid of Energy:</b> Shows the flow of energy. It is always upright.</div>
+            </details>
+
+            <details>
+                <summary>Q25. जनसंख्या नियंत्रण हेतु गर्भ निरोधन की विधियाँ (Contraceptive methods)</summary>
+                <div class="ans-content">1. <b>Barrier methods:</b> Condoms, diaphragms. 2. <b>Hormonal methods:</b> Oral pills (prevent ovulation). 3. <b>IUDs:</b> Copper-T, Loop (prevent implantation). 4. <b>Surgical methods:</b> Vasectomy in males (cutting vas deferens) and Tubectomy in females (cutting fallopian tubes).</div>
+            </details>
+
+            <details>
+                <summary>Q26. मत्स्य पालन क्या है? (Aquaculture/Fish farming)</summary>
+                <div class="ans-content">Rearing and breeding of aquatic animals (fish, prawns) for food is called aquaculture. <b>Role in food quality:</b> Fish is a rich source of high-quality animal protein, omega-3 fatty acids, and essential vitamins. It helps in combating malnutrition and improving overall dietary quality.</div>
+            </details>
+
+        </div>
+
+        <button onclick="location.reload()" style="margin-top: 30px;">Take Test Again</button>
+    </div>
+
+    <!-- 4. Rank List Section -->
+    <div id="rank-section" class="section">
+        <h2>Admin:  List</h2>
+        <div id="password-prompt">
+            <p style="text-align: center; margin-bottom: 15px;">Enter Password to view List</p>
+            <input type="password" id="adminPassword" placeholder="Enter Password">
+            <button onclick="checkPassword()">View  List</button>
+        </div>
+        <div id="rank-list-data" style="display: none;">
+            <table class="rank-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Student Name</th>
+                        <th>Score</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="rank-tbody">
+                    <!-- Data goes here -->
+                </tbody>
+            </table>
+            <button onclick="location.reload()" style="margin-top: 30px;">Back to Home</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- DATABASE (All 70 Questions Translated) ---
+    const questions = [
+        { id: 1, question: "The operon model shows?", options: ["Gene synthesis", "Gene expression", "Gene regulation", "Gene function"], correct: 2, reason: "The operon model (like the lac operon) explains how genes are regulated (turned on or off)." },
+        { id: 2, question: "Which of the following is a leguminous plant?", options: ["Potato", "Pea", "Orange", "All of these"], correct: 1, reason: "Pea (Pisum sativum) is a leguminous plant, known for nitrogen fixation." },
+        { id: 3, question: "Which of the following is a genetic material?", options: ["TMV", "Bacteriophage", "Both (A) and (B)", "None of these"], correct: 1, reason: "Bacteriophages have DNA as their genetic material." },
+        { id: 4, question: "In which of the following ecological pyramids, is energy flow maximum?", options: ["Unidirectional", "Bidirectional", "Multidirectional", "None of these"], correct: 0, reason: "Energy flow in an ecosystem is always unidirectional." },
+        { id: 5, question: "Which of the following is not a bio-fertilizer?", options: ["Azotobacter", "Bacillus thuringiensis", "Azolla", "Rhizobium"], correct: 1, reason: "Bacillus thuringiensis (Bt) is used as a biopesticide." },
+        { id: 6, question: "Exchange of gases in plants mainly occurs through?", options: ["Water", "Air", "Soil", "Contact"], correct: 1, reason: "Plants exchange gases with the surrounding air through stomata and lenticels." },
+        { id: 7, question: "A biotic factor in an ecosystem is?", options: ["Temperature", "Plant", "Medium", "All of these"], correct: 1, reason: "Plants are living organisms, hence they are biotic factors." },
+        { id: 8, question: "In which fruit is the seed coat (aril) eaten?", options: ["Sugarcane", "Lychee", "Potato", "All of these"], correct: 1, reason: "The edible fleshy part of a lychee is the aril." },
+        { id: 9, question: "SO2 pollution is caused by?", options: ["Algae", "Lichen", "Fungi", "All of these"], correct: 1, reason: "Lichens are highly sensitive to sulfur dioxide (SO2) pollution." },
+        { id: 10, question: "Which one produces honey?", options: ["Male honeybee", "Female honeybee", "Worker honeybee", "Both (A) and (B)"], correct: 2, reason: "Worker bees (sterile females) produce honey." },
+        { id: 11, question: "Which of the following diseases occurs in birds?", options: ["Ranikhet", "Flu", "Both (A) and (B)", "None of these"], correct: 2, reason: "Both Ranikhet disease and Bird flu are viral diseases in birds." },
+        { id: 12, question: "Curd and dough (Idli/Dosa) are made by which microorganism?", options: ["Bacteria", "Lactobacillus", "Virus", "Yeast"], correct: 1, reason: "Lactobacillus bacteria are primarily used to curdle milk." },
+        { id: 13, question: "Heroin is obtained from?", options: ["Maize", "Poppy", "Cycas", "None of these"], correct: 1, reason: "Heroin is synthesized from morphine, extracted from the opium poppy." },
+        { id: 14, question: "Operon model was proposed by?", options: ["Watson and Crick", "Nirenberg", "Jacob and Monod", "None of these"], correct: 2, reason: "François Jacob and Jacques Monod proposed the lac operon model." },
+        { id: 15, question: "Sickle cell anaemia occurs in?", options: ["Humans", "Monkeys", "Chimpanzees", "All of these"], correct: 0, reason: "Sickle cell anaemia is a genetic blood disorder found in humans." },
+        { id: 16, question: "Where does digestion occur in Amoeba and Paramoecium?", options: ["Amoeba", "Paramoecium", "Both (A) and (B)", "None of these"], correct: 2, reason: "Both perform intracellular digestion." },
+        { id: 17, question: "If Adenine in DNA is 18%, then what is the percentage of Guanine?", options: ["64", "36", "85", "32"], correct: 3, reason: "A=T=18%, so A+T=36%. Remaining 64% is G+C. Since G=C, Guanine is 32%." },
+        { id: 18, question: "For which disease is Widal test done?", options: ["Malaria", "Typhoid", "AIDS", "Cancer"], correct: 1, reason: "The Widal test is used to diagnose typhoid fever." },
+        { id: 19, question: "HIV infects which cells?", options: ["B-cells", "T-cells", "Epithelial cells", "T-helper cells"], correct: 3, reason: "HIV targets CD4+ T-helper cells." },
+        { id: 20, question: "The first line of defense against antigens is?", options: ["Antigen", "Vaccine", "Antibody", "Antitoxin"], correct: 2, reason: "Antibodies neutralize antigens." },
+        { id: 21, question: "Which hormone is secreted during fear?", options: ["Histamine", "Serotonin", "Both (A) and (B)", "None of these"], correct: 3, reason: "Adrenaline is secreted, so the answer is None of these." },
+        { id: 22, question: "Which part of the brain is affected by alcohol?", options: ["Medulla", "Cerebellum", "Hypothalamus", "Diencephalon"], correct: 1, reason: "Alcohol affects the cerebellum (balance and coordination)." },
+        { id: 23, question: "A gene that suppresses the effect of another gene is called?", options: ["Epistasis", "Dominance", "Mutation", "None of these"], correct: 0, reason: "Epistasis is the masking of one gene's effect by another." },
+        { id: 24, question: "The three consecutive bases on DNA that code for an amino acid are called?", options: ["Codon", "Nonsense codon", "Anti-codon", "Stop codon"], correct: 0, reason: "A triplet of nucleotides coding for an amino acid is a codon." },
+        { id: 25, question: "Which infectious agent causes disease in plants?", options: ["Protozoa", "Bacteria", "Virus", "Helminth"], correct: 2, reason: "Viruses cause many severe plant diseases." },
+        { id: 26, question: "Which organ is most affected by excessive alcohol consumption?", options: ["Lungs", "Liver", "Spleen", "Intestine"], correct: 1, reason: "The liver is highly susceptible to alcohol-induced damage." },
+        { id: 27, question: "An exception to Mendel's law is?", options: ["Dominance", "Purity of gametes", "Linkage", "Independent assortment"], correct: 2, reason: "Linkage is an exception to the law of independent assortment." },
+        { id: 28, question: "Which of the following is a bacterial disease?", options: ["Typhoid", "Jaundice", "Malaria", "Syphilis"], correct: 0, reason: "Typhoid is caused by Salmonella typhi." },
+        { id: 29, question: "Which of the following is not a viral disease?", options: ["Mumps", "Influenza", "Diphtheria", "Measles"], correct: 2, reason: "Diphtheria is a bacterial infection." },
+        { id: 30, question: "Which of the following is not included in apiculture?", options: ["Bee-keeping", "Poultry", "Fish farming", "Organic farming"], correct: 1, reason: "Poultry is bird farming, not apiculture (bee-keeping)." },
+        { id: 31, question: "Who is not associated with the discovery of the double helix model of DNA?", options: ["Louis Pasteur", "James Watson", "Francis Crick", "Robert Koch"], correct: 0, reason: "Louis Pasteur is known for germ theory." },
+        { id: 32, question: "Bt-cotton is obtained from?", options: ["E. coli", "B. thuringiensis", "Agrobacterium", "None of these"], correct: 1, reason: "Bt-cotton contains genes from Bacillus thuringiensis." },
+        { id: 33, question: "Mendel proposed?", options: ["Law of dominance", "Law of segregation", "Both (A) and (B)", "None of these"], correct: 2, reason: "Mendel proposed both laws." },
+        { id: 34, question: "The principle of segregation is also known as?", options: ["Law of dominance", "Law of independent assortment", "Law of purity of gametes", "None of these"], correct: 2, reason: "Alleles segregate randomly, keeping gametes pure." },
+        { id: 35, question: "What is most important for speciation?", options: ["Isolation", "Mutation", "Migration", "Continuous variation"], correct: 0, reason: "Reproductive isolation is the key factor." },
+        { id: 36, question: "A vestigial organ is?", options: ["Connecting link", "Vestigial organ", "Degenerated organ", "None of these"], correct: 2, reason: "Vestigial organs are degenerated (e.g., appendix)." },
+        { id: 37, question: "Dodo is an example of?", options: ["Extinct species", "Endangered species", "Vulnerable species", "None of these"], correct: 0, reason: "The Dodo is extinct." },
+        { id: 38, question: "Which of the following is a haploid structure?", options: ["Zygote", "Embryo sac", "Gamete", "None of these"], correct: 2, reason: "Gametes are haploid." },
+        { id: 39, question: "Which of the following is a hydrophyte?", options: ["Cactus", "Lotus", "Pea", "Acacia"], correct: 1, reason: "Lotus is an aquatic plant." },
+        { id: 40, question: "Sertoli cells are found in?", options: ["Ovary", "Uterus", "Testis", "Liver"], correct: 2, reason: "They are in the testes." },
+        { id: 41, question: "Number of chromosomes in human male is?", options: ["44+XX", "44+XY", "46+XY", "46+XX"], correct: 1, reason: "Males have 44 autosomes + XY." },
+        { id: 42, question: "One-horned rhinoceros is found in which state?", options: ["Assam", "West Bengal", "Uttar Pradesh", "Bihar"], correct: 0, reason: "Kaziranga National Park, Assam." },
+        { id: 43, question: "Biogas contains?", options: ["CO2", "H2", "CH4", "All of these"], correct: 3, reason: "Biogas contains all of these gases." },
+        { id: 44, question: "Crossing over occurs in which stage?", options: ["Leptotene", "Zygotene", "Pachytene", "Diakinesis"], correct: 2, reason: "Crossing over occurs in Pachytene." },
+        { id: 45, question: "ELISA test is used for?", options: ["HIV", "Tuberculosis", "Cancer", "None of these"], correct: 0, reason: "ELISA is used for HIV screening." },
+        { id: 46, question: "Each living plant cell has the ability to form a whole plant. This is called?", options: ["Cloning", "Somatic hybridization", "Totipotency", "None of these"], correct: 2, reason: "This ability is called Totipotency." },
+        { id: 47, question: "Chromosome number in gametes of angiosperms is?", options: ["n", "2n", "3n", "Both (A) and (C)"], correct: 0, reason: "Gametes are haploid (n)." },
+        { id: 48, question: "When an organism develops from a single parent, it is called?", options: ["Sexual reproduction", "Asexual reproduction", "Both (A) and (B)", "Internal fertilization"], correct: 1, reason: "Single parent = Asexual reproduction." },
+        { id: 49, question: "How many chromosomes are there in the human genome?", options: ["21", "23", "44", "46"], correct: 1, reason: "23 pairs (haploid set is 23)." },
+        { id: 50, question: "Restriction endonuclease is a?", options: ["Exonuclease", "Endonuclease", "Ligase", "Polymerase"], correct: 1, reason: "It is an endonuclease." },
+        { id: 51, question: "Bio-diversity is protected in?", options: ["Flora", "Fauna", "Ecosystem", "Both (A) and (B)"], correct: 3, reason: "Biodiversity includes both flora and fauna." },
+        { id: 52, question: "Secondary productivity is related to?", options: ["Producers", "Herbivores", "Carnivores", "None of these"], correct: 1, reason: "It relates to consumers (herbivores)." },
+        { id: 53, question: "Pasteurization involves heating milk to?", options: ["100°C", "Above 100°C", "70°C", "None of these"], correct: 2, reason: "Heated to about 70°C." },
+        { id: 54, question: "Placentation in tomato is?", options: ["Unilocular", "Bilocular", "Trilocular", "Multilocular"], correct: 3, reason: "Tomato has multilocular placentation." },
+        { id: 55, question: "T-lymphocytes are produced in?", options: ["Bone marrow", "Stomach", "Thymus", "Liver"], correct: 2, reason: "T-cells mature in the Thymus." },
+        { id: 56, question: "The source of EcoRI enzyme is?", options: ["BamHI", "E. coli", "Both (A) and (B)", "Hind III"], correct: 1, reason: "EcoRI comes from E. coli." },
+        { id: 57, question: "Which of the following is an insectivorous plant?", options: ["Drosera", "Nepenthes", "Both (A) and (B)", "Hydrilla"], correct: 2, reason: "Both are insectivorous." },
+        { id: 58, question: "Which of the following is an oviparous animal?", options: ["Mammal", "Snake", "Both (A) and (B)", "Tortoise"], correct: 2, reason: "Reptiles like snakes and tortoises are oviparous." },
+        { id: 59, question: "Which of the following is a microorganism?", options: ["Algae", "Bacteria", "Protozoa", "Single cell protein"], correct: 1, reason: "Bacteria are microorganisms." },
+        { id: 60, question: "'Cry-gene' protects which crop?", options: ["Cotton", "Tea", "Mango", "Wheat"], correct: 0, reason: "It protects Bt-cotton." },
+        { id: 61, question: "Which of the following is a purine base?", options: ["Adenine and Cytosine", "Adenine and Guanine", "Cytosine and Guanine", "None of these"], correct: 1, reason: "Adenine and Guanine are purines." },
+        { id: 62, question: "Cancer is caused by?", options: ["Bacteria", "Oncogenes", "Both (A) and (B)", "None of these"], correct: 1, reason: "Oncogenes cause cancer." },
+        { id: 63, question: "Which reproduction is found in humans?", options: ["Asexual", "Sexual", "Both (A) and (B)", "None of these"], correct: 1, reason: "Humans reproduce sexually." },
+        { id: 64, question: "The base pairs found in RNA are?", options: ["Cytosine and Thymine", "Adenine and Guanine", "Cytosine and Guanine", "Thymine and Uracil"], correct: 1, reason: "Adenine pairs with Uracil, Cytosine with Guanine." },
+        { id: 65, question: "Which is not a live vaccine?", options: ["Diphtheria", "Polio", "Typhoid", "Tetanus"], correct: 3, reason: "Tetanus is a toxoid vaccine." },
+        { id: 66, question: "Which of the following is not a greenhouse gas?", options: ["Methane", "Chlorofluorocarbon", "Carbon dioxide", "Nitrogen"], correct: 3, reason: "Nitrogen is not a greenhouse gas." },
+        { id: 67, question: "Kanha National Park is famous for?", options: ["Birds", "Tigers", "Rhinos", "Deer"], correct: 1, reason: "Famous for tigers." },
+        { id: 68, question: "Which of the following food chains is correct?", options: ["Grass, Goat and Human", "Goat, Cow and Grass", "Grass, Goat and Lion", "Grass, Fish and Goat"], correct: 2, reason: "Producer -> Primary Consumer -> Secondary Consumer." },
+        { id: 69, question: "A nucleoside is:", options: ["Sugar + A nitrogenous base", "Sugar + Phosphate", "Nitrogenous base + Phosphate", "None of these"], correct: 0, reason: "Nucleoside = Sugar + Base (no phosphate)." },
+        { id: 70, question: "Gamete formation is called:", options: ["Gametogenesis", "Cytokinesis", "Sporogenesis", "None of these"], correct: 0, reason: "Gamete formation is gametogenesis." }
+    ];
+
+    let currentStudentName = "";
+    let userAnswers = {}; 
+
+    // --- SCROLL TO TOP LOGIC ---
+    let mybutton = document.getElementById("scrollTopBtn");
+    window.onscroll = function() { scrollFunction() };
+    function scrollFunction() {
+        if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+            mybutton.style.display = "flex";
+        } else {
+            mybutton.style.display = "none";
+        }
+    }
+    function topFunction() {
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+    }
+
+    // --- NAVIGATION FUNCTIONS ---
+    function showSection(sectionId) {
+        document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active-section'));
+        document.getElementById(sectionId).classList.add('active-section');
+        topFunction();
+    }
+
+    // --- 1. LOGIN / START TEST ---
+    function startTest() {
+        const nameInput = document.getElementById('studentName').value.trim();
+        if (nameInput === "") {
+            alert("Please enter your name!");
+            return;
+        }
+        currentStudentName = nameInput;
+        renderQuestions();
+        showSection('quiz-section');
+    }
+
+    // --- 2. RENDER QUESTIONS ---
+    function renderQuestions() {
+        const container = document.getElementById('questions-container');
+        container.innerHTML = "";
+        
+        questions.forEach((q, index) => {
+            let html = `<div class="question-box" id="qbox-${q.id}">`;
+            html += `<div class="question-text">Q${q.id}. ${q.question}</div>`;
+            
+            q.options.forEach((opt, optIndex) => {
+                html += `
+                    <div class="option" id="opt-${q.id}-${optIndex}" onclick="checkAnswerInstant(${q.id}, ${optIndex})">
+                        <strong>${String.fromCharCode(65 + optIndex)}.</strong> ${opt}
+                    </div>
+                `;
+            });
+            
+            html += `<div class="instant-reason" id="reason-${q.id}">
+                        <strong>Reason:</strong> ${q.reason}
+                     </div>`;
+            
+            html += `</div>`;
+            container.innerHTML += html;
+        });
+    }
+
+    // --- 3. INSTANT FEEDBACK ON CLICK ---
+    function checkAnswerInstant(qId, selectedIndex) {
+        if (userAnswers[qId] !== undefined) return; 
+
+        const qData = questions.find(q => q.id === qId);
+        const correctIndex = qData.correct;
+        
+        userAnswers[qId] = selectedIndex;
+
+        const selectedOptElement = document.getElementById(`opt-${qId}-${selectedIndex}`);
+        const correctOptElement = document.getElementById(`opt-${qId}-${correctIndex}`);
+        const reasonElement = document.getElementById(`reason-${qId}`);
+
+        qData.options.forEach((_, i) => {
+            document.getElementById(`opt-${qId}-${i}`).classList.add('locked');
+        });
+
+        if (selectedIndex === correctIndex) {
+            selectedOptElement.classList.add('correct-ans');
+        } else {
+            selectedOptElement.classList.add('wrong-ans');
+            correctOptElement.classList.add('correct-ans');
+        }
+
+        reasonElement.style.display = "block";
+    }
+
+    // --- 4. SUBMIT TEST ---
+    function submitTest() {
+        const answeredCount = Object.keys(userAnswers).length;
+        const totalQuestions = questions.length;
+        
+        if (answeredCount < totalQuestions) {
+            const confirmSubmit = confirm(`You have answered ${answeredCount} out of ${totalQuestions} questions.\n\nDo you want to submit anyway? Unanswered questions will be marked wrong.`);
+            if (!confirmSubmit) return;
+        }
+
+        let score = 0;
+        questions.forEach(q => {
+            if (userAnswers[q.id] === q.correct) {
+                score++;
+            }
+        });
+
+        saveToDatabase(currentStudentName, score, totalQuestions);
+        showResults(score, totalQuestions);
+    }
+
+    // --- 5. SHOW RESULTS ---
+    function showResults(score, totalQuestions) {
+        document.getElementById('score-display').innerText = `${currentStudentName}, your score is: ${score} / ${totalQuestions}`;
+        
+        const reviewContainer = document.getElementById('review-container');
+        reviewContainer.innerHTML = "";
+
+        questions.forEach((q, index) => {
+            const userAns = userAnswers[q.id];
+            const isCorrect = userAns === q.correct;
+            let userAnswerText = userAns !== undefined ? q.options[userAns] : "Not Answered";
+
+            let html = `<div class="result-box ${isCorrect ? 'correct' : 'incorrect'}">`;
+            html += `<strong>Q${q.id}. ${q.question}</strong><br><br>`;
+            html += `<span style="color: ${isCorrect ? '#28a745' : '#dc3545'};"><strong>Your Answer:</strong> ${userAnswerText}</span><br>`;
+            
+            if (!isCorrect) {
+                html += `<span style="color: #28a745;"><strong>Correct Answer:</strong> ${q.options[q.correct]}</span><br>`;
+            }
+            
+            html += `<div style="margin-top: 10px; padding: 10px; background: rgba(255,255,255,0.6); border-radius: 8px;"><strong>Reason:</strong> ${q.reason}</div>`;
+            html += `</div>`;
+            
+            reviewContainer.innerHTML += html;
+        });
+
+        showSection('result-section');
+    }
+
+    // --- 6. DATABASE (LOCAL STORAGE) & RANK LIST ---
+    function saveToDatabase(name, score, total) {
+        let students = JSON.parse(localStorage.getItem('bio_pyq_students')) || [];
+        const date = new Date().toLocaleDateString();
+        
+        students.push({ name, score, total, date });
+        students.sort((a, b) => b.score - a.score);
+        
+        localStorage.setItem('bio_pyq_students', JSON.stringify(students));
+    }
+
+    function showRankListPrompt() {
+        showSection('rank-section');
+        document.getElementById('password-prompt').style.display = 'block';
+        document.getElementById('rank-list-data').style.display = 'none';
+        document.getElementById('adminPassword').value = '';
+    }
+
+    function checkPassword() {
+        const password = document.getElementById('adminPassword').value;
+        if (password === "Alisha123") {
+            document.getElementById('password-prompt').style.display = 'none';
+            document.getElementById('rank-list-data').style.display = 'block';
+            renderRankList();
+        } else {
+            alert("Incorrect Password!");
+        }
+    }
+
+    function renderRankList() {
+        const tbody = document.getElementById('rank-tbody');
+        tbody.innerHTML = "";
+        
+        let students = JSON.parse(localStorage.getItem('bio_pyq_students')) || [];
+        
+        if (students.length === 0) {
+            tbody.innerHTML = "<tr><td colspan='4' style='text-align:center;'>No students have taken the test yet.</td></tr>";
+            return;
+        }
+
+        students.forEach((student, index) => {
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${student.name}</td>
+                <td>${student.score} / ${student.total}</td>
+                <td>${student.date}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+</script>
+
+</body>
+</html>
