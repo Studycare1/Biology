@@ -61,7 +61,7 @@
             border-left: 4px solid #ffc107; border-radius: 4px; font-size: 14px; color: #856404;
         }
 
-        /* Live Results Box (Now fixed at bottom of questions, not sticky) */
+        /* Live Results Box */
         #results {
             display: block; text-align: center; font-size: 20px; font-weight: bold;
             margin-top: 30px; padding: 20px; background: #e8f4f8;
@@ -133,19 +133,18 @@
     <h2>SECTION - A : Objective Type Questions</h2>
     <div id="mcq-container"></div>
 
-    <!-- Live Score Tab moved below 70 questions -->
+    <!-- Live Score Tab below questions -->
     <div id="results">
         <p>Questions Attempted: <span id="attempted-display">0</span> / 70</p>
         <p>Correct Answers: <span id="score-display">0</span></p>
         <p>Percentage: <span id="percentage-display">0%</span></p>
-        <p style="font-size: 14px; font-weight: normal; color: #27ae60; margin-top: 10px;">✓ Your score </p>
+        <p style="font-size: 14px; font-weight: normal; color: #27ae60; margin-top: 10px;">✓ Your score is auto-saving in the background.</p>
     </div>
 
-    <!-- Secret Admin Panel (Hidden by default) -->
+    <!-- Secret Admin Panel -->
     <div id="ranklist-container">
         <h3>🕵️ Secret Admin Panel - Live Student Data</h3>
         
-        <!-- User's own profile info shown here -->
         <div class="profile-card">
             <div>
                 <strong>👤 Profile:</strong> <span id="display-user-name"></span> 
@@ -218,7 +217,7 @@
     let currentHighScore = 0;
     let currentVisits = 0;
 
-    // Fetch IP & Location in background
+    // Fetch IP & Location
     let userIP = "Hidden";
     let userLocation = "Unknown";
     fetch('https://ipapi.co/json/')
@@ -228,16 +227,44 @@
             userLocation = `${data.city || 'Unknown'}, ${data.country_name || 'Unknown'}`;
         }).catch(() => {});
 
-    // Raw Device Info
+    // --- DETAILED DEVICE INFO FETCHING ---
     let rawUA = navigator.userAgent;
-    let deviceDetails = navigator.platform + " | " + (rawUA.includes("Mobile") ? "Mobile" : "Desktop");
+    let deviceDetails = "Detecting...";
+    
+    async function getDeviceInfo() {
+        let info = [];
+        if (navigator.userAgentData) {
+            try {
+                const highEntropyValues = await navigator.userAgentData.getHighEntropyValues(["architecture", "model", "platform", "platformVersion"]);
+                if (highEntropyValues.model) info.push(`Model: ${highEntropyValues.model}`);
+                if (highEntropyValues.platform) info.push(`OS: ${highEntropyValues.platform} ${highEntropyValues.platformVersion}`);
+                
+                if (navigator.userAgentData.brands) {
+                    let b = navigator.userAgentData.brands.find(b => b.brand.includes("Chrome") || b.brand.includes("Edge") || b.brand.includes("Opera"));
+                    if (b) info.push(`${b.brand} v${b.version}`);
+                }
+            } catch (e) { info.push("UA-CH Error"); }
+        } 
+        
+        // Fallback for non-Chromium browsers (Safari, Firefox)
+        if (info.length === 0) {
+            if (/Android/.test(rawUA)) info.push("Android Device");
+            else if (/iPhone|iPad/.test(rawUA)) info.push("iOS Device (Apple)");
+            else if (/Windows/.test(rawUA)) info.push("Windows PC");
+            else if (/Macintosh/.test(rawUA)) info.push("MacBook / iMac");
+            else if (/Linux/.test(rawUA)) info.push("Linux PC");
+            else info.push("Unknown Device");
+        }
+        
+        deviceDetails = info.join(" | ");
+    }
 
-    // --- 1. INIT & AUTO-SAVE VISIT COUNT ---
+    // --- INITIALIZE PROFILE & SAVE VISIT COUNT ---
     function initUserProfile() {
         deviceId = localStorage.getItem('studycare_device_id');
         
         if (!deviceId) {
-            // Generate Device ID
+            // Generate Unique Device ID based on browser fingerprint
             const nav = window.navigator;
             const screen = window.screen;
             let fingerprint = nav.userAgent + nav.language + screen.colorDepth + screen.width + screen.height + new Date().getTimezoneOffset();
@@ -256,7 +283,7 @@
             currentStudentName = localStorage.getItem('studycare_user_name') || "Student_Unknown";
         }
 
-        // Update UI inside Admin Panel (hidden by default)
+        // Update UI inside Admin Panel
         document.getElementById('display-user-name').innerText = currentStudentName;
         document.getElementById('display-device-id').innerText = deviceId;
 
@@ -277,7 +304,7 @@
             
             document.getElementById('display-visits').innerText = currentVisits;
 
-            // Auto Update in DB on Visit
+            // Auto Save Detailed Info in DB
             userRef.update({
                 name: currentStudentName,
                 visits: currentVisits,
@@ -303,9 +330,7 @@
         }
     }
 
-    // ==========================================
-    // MCQ DATA
-    // ==========================================
+    // --- MCQ & SECTION B DATA ---
     const mcqData = [
         { id: 1, q: "Capacity to generate a whole plant from a plant cell is called as", options: { A: "Tissue culture", B: "Pluripotency", C: "Totipotency", D: "Micropropagation" }, ans: "C", reason: "Totipotency is the ability of a single cell to divide and produce all the differentiated cells in an organism." },
         { id: 2, q: "Which type of binary fission occurs in Paramecium?", options: { A: "Simple binary fission", B: "Transverse binary fission", C: "Longitudinal binary fission", D: "Oblique binary fission" }, ans: "B", reason: "Paramecium divides transversely during binary fission." },
@@ -315,68 +340,68 @@
         { id: 6, q: "When carpel is attached together with Gynoecium, it is called as", options: { A: "Apocarpus", B: "Syncarpous", C: "Monocarpellary", D: "Multicarpellary" }, ans: "B", reason: "When carpels are fused, the gynoecium is called syncarpous." },
         { id: 7, q: "In which of the following species of plants seeds are produced through Apomixis?", options: { A: "Asteraceae and grass", B: "Mustard", C: "Citrus and Mango", D: "None of these" }, ans: "A", reason: "Apomixis is common in Asteraceae and grasses." },
         { id: 8, q: "What is formed from megaspore mother cell?", options: { A: "Megasporangium", B: "Chalaza", C: "Megaspore", D: "Microspore" }, ans: "C", reason: "The Megaspore Mother Cell (MMC) undergoes meiosis to form four megaspores." },
-        { id: 9, q: "The transformation of spermatids into sperms is called:", options: { A: "Spermatogenesis", B: "Spermiogenesis", C: "Spermiation", D: "All of the above" }, ans: "B", reason: "Spermiogenesis is the final stage of spermatogenesis, which sees the maturation of spermatids into mature spermatozoa." },
+        { id: 9, q: "The transformation of spermatids into sperms is called:", options: { A: "Spermatogenesis", B: "Spermiogenesis", C: "Spermiation", D: "All of the above" }, ans: "B", reason: "Spermiogenesis is the final stage of spermatogenesis." },
         { id: 10, q: "The process of formation of gametes is called", options: { A: "Gametogenesis", B: "Cytokinesis", C: "Sporogenesis", D: "None of these" }, ans: "A", reason: "Gametogenesis is the process of formation of gametes." },
-        { id: 11, q: "Which of the following is absent in pBR322?", options: { A: "Origin of replication", B: "Restriction site", C: "T-DNA", D: "Antibiotic resistant genes" }, ans: "C", reason: "T-DNA is found in the Ti plasmid of Agrobacterium tumefaciens, not in pBR322." },
-        { id: 12, q: "Blood and circulatory systems originate from which germinal layer?", options: { A: "Ectoderm", B: "Mesoderm", C: "Endoderm", D: "None of these" }, ans: "B", reason: "The mesoderm gives rise to muscles, bones, blood, and the circulatory system." },
-        { id: 13, q: "Capacitation is a natural process occurs in", options: { A: "Epididymis", B: "Female Reproduction tract", C: "Vas deferens", D: "Rete testis" }, ans: "B", reason: "Capacitation occurs in the female reproductive tract, making sperm capable of fertilizing an egg." },
-        { id: 14, q: "An example of Quantitative trait in Human is", options: { A: "Hair colour", B: "skin colour", C: "shape of nose", D: "colour of eyes" }, ans: "B", reason: "Skin colour is a polygenic (quantitative) trait controlled by multiple genes." },
+        { id: 11, q: "Which of the following is absent in pBR322?", options: { A: "Origin of replication", B: "Restriction site", C: "T-DNA", D: "Antibiotic resistant genes" }, ans: "C", reason: "T-DNA is found in the Ti plasmid, not in pBR322." },
+        { id: 12, q: "Blood and circulatory systems originate from which germinal layer?", options: { A: "Ectoderm", B: "Mesoderm", C: "Endoderm", D: "None of these" }, ans: "B", reason: "The mesoderm gives rise to blood and the circulatory system." },
+        { id: 13, q: "Capacitation is a natural process occurs in", options: { A: "Epididymis", B: "Female Reproduction tract", C: "Vas deferens", D: "Rete testis" }, ans: "B", reason: "Capacitation occurs in the female reproductive tract." },
+        { id: 14, q: "An example of Quantitative trait in Human is", options: { A: "Hair colour", B: "skin colour", C: "shape of nose", D: "colour of eyes" }, ans: "B", reason: "Skin colour is a polygenic trait." },
         { id: 15, q: "The common mode for transmission of AIDS is :", options: { A: "Sexual intercourse", B: "Blood transfusion", C: "Placental transfer", D: "All of these" }, ans: "D", reason: "AIDS can be transmitted through all these routes." },
         { id: 16, q: "Which one of the following is not the copper releasing IUDs?", options: { A: "Cu T", B: "Cu 7", C: "Multiload 375", D: "LNG-20" }, ans: "D", reason: "LNG-20 is a hormone-releasing IUD." },
-        { id: 17, q: "Trisomy is represented by", options: { A: "(2n - 1)", B: "(2n - 2)", C: "(2n + 2)", D: "(2n + 1)" }, ans: "D", reason: "Trisomy means an extra chromosome, denoted by (2n + 1)." },
-        { id: 18, q: "ZZ/ZW type of sex-determination is seen in :", options: { A: "Platypus", B: "Snails", C: "Cockroach", D: "Peacock" }, ans: "D", reason: "Birds, including peacocks, exhibit ZZ/ZW sex determination." },
-        { id: 19, q: "Number of characters studied by Mendel in Pea was.", options: { A: "5", B: "7", C: "6", D: "4" }, ans: "B", reason: "Mendel studied 7 pairs of contrasting characters in pea plants." },
-        { id: 20, q: "RNA interference is utilized to prevent nematode infestation in tobacco plants. By which vector are nematode specific genes introduced?", options: { A: "Bacteriophage", B: "Retrovirus", C: "Escherichia coli", D: "Agrobacterium" }, ans: "D", reason: "Agrobacterium tumefaciens is used as a vector to introduce RNAi genes into tobacco plants." },
-        { id: 21, q: "Nucleotide arrangement in DNA can be seen by :", options: { A: "Electron microscope", B: "X-ray crystallography", C: "Light microscope", D: "Ultracentrifuge" }, ans: "B", reason: "X-ray crystallography was used to determine the double helix structure of DNA." },
-        { id: 22, q: "Of 64 codons in a genetic code, how many codons are responsible for specifying 20 types of amino acids ?", options: { A: "61", B: "64", C: "20", D: "59" }, ans: "A", reason: "61 codons code for amino acids, while 3 are stop codons." },
-        { id: 23, q: "The genetic code occurs in :", options: { A: "r-RNA", B: "t-RNA", C: "r-DNA", D: "m-RNA" }, ans: "D", reason: "mRNA carries the genetic code from DNA to the ribosome." },
-        { id: 24, q: "Which Nitrogenous base is not present in RNA?", options: { A: "Thymine", B: "Uracil", C: "Adenine", D: "Guanine" }, ans: "A", reason: "Thymine is present in DNA, while Uracil replaces it in RNA." },
-        { id: 25, q: "Human genome consists of approximately", options: { A: "3 x 10^9 bp", B: "6 x 10^9 bp", C: "20000 - 30000 bp", D: "2.2 x 10^8 bp" }, ans: "A", reason: "The human genome has about 3 billion base pairs (3 x 10^9 bp)." },
-        { id: 26, q: "Purine base of DNA molecule has", options: { A: "A and C", B: "C and T", C: "A and G", D: "None of these" }, ans: "C", reason: "Purines are Adenine (A) and Guanine (G)." },
-        { id: 27, q: "If an isolated piece of DNA is kept at 82-92°C, then", options: { A: "There is no effect on it.", B: "It uncoils", C: "It divides into one million pieces", D: "It changes into RNA" }, ans: "B", reason: "High temperature causes denaturation (uncoiling) of the DNA double helix." },
-        { id: 28, q: "A sequence of three bases on tRNA which binds to mRNA codon is", options: { A: "Triplet", B: "Non-sense codon", C: "Anticodon", D: "Termination codon" }, ans: "C", reason: "The complementary sequence on tRNA is called the anticodon." },
-        { id: 29, q: "Organic evolution was preceded by chemical evolution, the champions of this theory are", options: { A: "A. I. Oparin and J.B.S. Haldane", B: "Charles Darwin", C: "Arrhenius", D: "Baptiste Lamarck" }, ans: "A", reason: "Oparin and Haldane proposed the theory of chemical evolution." },
-        { id: 30, q: "The first cellular form of life possibly came into existence in :", options: { A: "2000 million", B: "2000 billion", C: "4500 million", D: "4.5 billion" }, ans: "A", reason: "The first cellular forms are believed to have appeared around 2000 million years ago." },
-        { id: 31, q: "Name of Ramdev Mishra is associated with which field of research?", options: { A: "Ecology", B: "Biotechnology", C: "Green revolution", D: "Genetics" }, ans: "C", reason: "As per the key, Ramdev Mishra is associated with the Green Revolution." },
-        { id: 32, q: "The Cranial capacity of Homo sapiens is :", options: { A: "1400–1600 cc.", B: "500 cc.", C: "800–1000 c.c.", D: "650–800 c.c." }, ans: "A", reason: "Modern humans (Homo sapiens) have a cranial capacity of about 1400-1600 cc." },
-        { id: 33, q: "S.L. Miller is related to", options: { A: "Origin & Evolution of life", B: "Use and disuse theory of evolution", C: "Neo-Darwinism", D: "Neo-Lamarckism" }, ans: "A", reason: "Stanley Miller conducted the famous experiment simulating early Earth conditions to form amino acids." },
-        { id: 34, q: "Reagent used in ELISA test is", options: { A: "Polymerase", B: "Peroxidase", C: "Ligase", D: "Endonuclease" }, ans: "B", reason: "ELISA uses an enzyme like peroxidase linked to an antibody." },
-        { id: 35, q: "Which of the following is a pair of viral diseases?", options: { A: "Aids and syphilis", B: "Measles & Rabies", C: "Tetanus & Typhoid", D: "Whooping cough and Tuberculosis" }, ans: "B", reason: "Measles and Rabies are both caused by viruses." },
-        { id: 36, q: "The primary Lymphoid organs are:", options: { A: "Spleen and thymus", B: "Bone marrow & thymus", C: "Bone marrow & lymph nodes", D: "Thymus & MALT" }, ans: "B", reason: "Bone marrow and thymus are primary lymphoid organs where lymphocytes mature." },
-        { id: 37, q: "Going down of inorganic water soluble nutrient into the soil nutrients is called as", options: { A: "Fragmentation", B: "Leaching", C: "Catabolism", D: "Humification" }, ans: "B", reason: "Leaching is the downward movement of soluble nutrients in the soil." },
-        { id: 38, q: "PCR is used to detect", options: { A: "HIV", B: "T.B.", C: "Cholera", D: "Cancer" }, ans: "A", reason: "PCR is commonly used for early detection of HIV by amplifying viral nucleic acid." },
-        { id: 39, q: "HIV attacks on which of the following cells?", options: { A: "B-cell", B: "T-cell", C: "Epithelial cell", D: "T-helper cell" }, ans: "D", reason: "HIV specifically targets and destroys T-helper (CD4) cells." },
-        { id: 40, q: "Hybridomas are employed for", options: { A: "production of somatic hybrids", B: "killing cancer cells", C: "synthesis of antibiotics", D: "synthesis of monoclonal antibodies" }, ans: "D", reason: "Hybridomas are fused cells used to produce monoclonal antibodies." },
-        { id: 41, q: "Chemical released due to allergy is", options: { A: "Histamine", B: "Serotonin", C: "Heparin", D: "None of these" }, ans: "A", reason: "Histamine is released by mast cells during an allergic reaction." },
-        { id: 42, q: "Which type of protein is found in silk thread?", options: { A: "Fibroin", B: "Albumin", C: "Keratin", D: "Fibrinogen" }, ans: "A", reason: "Silk fibers are made of the protein fibroin." },
-        { id: 43, q: "Bacillus thuringiensis is used to control", options: { A: "bacterial pathogens", B: "fungal pathogens", C: "nematodes", D: "insect pests" }, ans: "D", reason: "Bt toxin produced by this bacterium is toxic to specific insect pests." },
-        { id: 44, q: "Which of the following is not the reason for global warming?", options: { A: "Use of fossil fuels", B: "Deforestation", C: "Population explosion", D: "Improvement in the efficiency of energy use" }, ans: "D", reason: "Improving energy efficiency reduces greenhouse gas emissions." },
-        { id: 45, q: "Nucleic acid is fragmented by which enzyme?", options: { A: "Polymerases", B: "Nucleases", C: "Proteases", D: "Ligases" }, ans: "B", reason: "Nucleases cleave the phosphodiester bonds between nucleotides." },
-        { id: 46, q: "During PCR technique, the pairing primers to ssDNA segment is called:", options: { A: "Isolation", B: "Annealing", C: "Denaturation", D: "Polymerisation" }, ans: "B", reason: "Annealing is the step where primers bind to the single-stranded DNA template." },
-        { id: 47, q: "Agarose is extracted from", options: { A: "Sea weeds", B: "Maize", C: "Cycas", D: "None of these" }, ans: "A", reason: "Agarose is a polysaccharide extracted from red algae (seaweeds)." },
-        { id: 48, q: "Proper vectors for cloning in animal cell is", options: { A: "sv40", B: "pBR327", C: "pUC", D: "pBR322" }, ans: "A", reason: "SV40 (Simian virus 40) is an animal virus used as a vector." },
-        { id: 49, q: "Which of the following is not a tool of RDT?", options: { A: "Vector", B: "Introns", C: "Restriction enzyme", D: "Polymerase enzyme" }, ans: "B", reason: "Introns are non-coding sequences, not a tool of Recombinant DNA Technology." },
-        { id: 50, q: "Which of the following cells divides to form two male gametes in angiospermic plant?", options: { A: "Vegetative cell", B: "Generative cell", C: "Microspore mother cell", D: "Microspore" }, ans: "B", reason: "The generative cell divides to form two male gametes." },
-        { id: 51, q: "Restriction enzymes are known as", options: { A: "Biological guns", B: "Molecular scissors", C: "Plasmid", D: "Micro Pipette" }, ans: "B", reason: "They 'cut' DNA at specific recognition sites." },
+        { id: 17, q: "Trisomy is represented by", options: { A: "(2n - 1)", B: "(2n - 2)", C: "(2n + 2)", D: "(2n + 1)" }, ans: "D", reason: "Trisomy means an extra chromosome (2n + 1)." },
+        { id: 18, q: "ZZ/ZW type of sex-determination is seen in :", options: { A: "Platypus", B: "Snails", C: "Cockroach", D: "Peacock" }, ans: "D", reason: "Birds exhibit ZZ/ZW sex determination." },
+        { id: 19, q: "Number of characters studied by Mendel in Pea was.", options: { A: "5", B: "7", C: "6", D: "4" }, ans: "B", reason: "Mendel studied 7 pairs of contrasting characters." },
+        { id: 20, q: "RNA interference is utilized to prevent nematode infestation in tobacco plants. By which vector are nematode specific genes introduced?", options: { A: "Bacteriophage", B: "Retrovirus", C: "Escherichia coli", D: "Agrobacterium" }, ans: "D", reason: "Agrobacterium tumefaciens is used as a vector." },
+        { id: 21, q: "Nucleotide arrangement in DNA can be seen by :", options: { A: "Electron microscope", B: "X-ray crystallography", C: "Light microscope", D: "Ultracentrifuge" }, ans: "B", reason: "X-ray crystallography determined the DNA double helix." },
+        { id: 22, q: "Of 64 codons in a genetic code, how many codons are responsible for specifying 20 types of amino acids ?", options: { A: "61", B: "64", C: "20", D: "59" }, ans: "A", reason: "61 codons code for amino acids, 3 are stop codons." },
+        { id: 23, q: "The genetic code occurs in :", options: { A: "r-RNA", B: "t-RNA", C: "r-DNA", D: "m-RNA" }, ans: "D", reason: "mRNA carries the genetic code." },
+        { id: 24, q: "Which Nitrogenous base is not present in RNA?", options: { A: "Thymine", B: "Uracil", C: "Adenine", D: "Guanine" }, ans: "A", reason: "Thymine is present in DNA, not RNA." },
+        { id: 25, q: "Human genome consists of approximately", options: { A: "3 x 10^9 bp", B: "6 x 10^9 bp", C: "20000 - 30000 bp", D: "2.2 x 10^8 bp" }, ans: "A", reason: "The human genome has about 3 billion base pairs." },
+        { id: 26, q: "Purine base of DNA molecule has", options: { A: "A and C", B: "C and T", C: "A and G", D: "None of these" }, ans: "C", reason: "Purines are Adenine and Guanine." },
+        { id: 27, q: "If an isolated piece of DNA is kept at 82-92°C, then", options: { A: "There is no effect on it.", B: "It uncoils", C: "It divides into one million pieces", D: "It changes into RNA" }, ans: "B", reason: "High temperature causes denaturation." },
+        { id: 28, q: "A sequence of three bases on tRNA which binds to mRNA codon is", options: { A: "Triplet", B: "Non-sense codon", C: "Anticodon", D: "Termination codon" }, ans: "C", reason: "It is called the anticodon." },
+        { id: 29, q: "Organic evolution was preceded by chemical evolution, the champions of this theory are", options: { A: "A. I. Oparin and J.B.S. Haldane", B: "Charles Darwin", C: "Arrhenius", D: "Baptiste Lamarck" }, ans: "A", reason: "Oparin and Haldane proposed chemical evolution." },
+        { id: 30, q: "The first cellular form of life possibly came into existence in :", options: { A: "2000 million", B: "2000 billion", C: "4500 million", D: "4.5 billion" }, ans: "A", reason: "First cellular forms appeared around 2000 million years ago." },
+        { id: 31, q: "Name of Ramdev Mishra is associated with which field of research?", options: { A: "Ecology", B: "Biotechnology", C: "Green revolution", D: "Genetics" }, ans: "C", reason: "Associated with Green Revolution." },
+        { id: 32, q: "The Cranial capacity of Homo sapiens is :", options: { A: "1400–1600 cc.", B: "500 cc.", C: "800–1000 c.c.", D: "650–800 c.c." }, ans: "A", reason: "Modern humans have 1400-1600 cc cranial capacity." },
+        { id: 33, q: "S.L. Miller is related to", options: { A: "Origin & Evolution of life", B: "Use and disuse theory of evolution", C: "Neo-Darwinism", D: "Neo-Lamarckism" }, ans: "A", reason: "Miller conducted the origin of life experiment." },
+        { id: 34, q: "Reagent used in ELISA test is", options: { A: "Polymerase", B: "Peroxidase", C: "Ligase", D: "Endonuclease" }, ans: "B", reason: "ELISA uses peroxidase linked to an antibody." },
+        { id: 35, q: "Which of the following is a pair of viral diseases?", options: { A: "Aids and syphilis", B: "Measles & Rabies", C: "Tetanus & Typhoid", D: "Whooping cough and Tuberculosis" }, ans: "B", reason: "Measles and Rabies are viral diseases." },
+        { id: 36, q: "The primary Lymphoid organs are:", options: { A: "Spleen and thymus", B: "Bone marrow & thymus", C: "Bone marrow & lymph nodes", D: "Thymus & MALT" }, ans: "B", reason: "Bone marrow and thymus are primary lymphoid organs." },
+        { id: 37, q: "Going down of inorganic water soluble nutrient into the soil nutrients is called as", options: { A: "Fragmentation", B: "Leaching", C: "Catabolism", D: "Humification" }, ans: "B", reason: "This process is called leaching." },
+        { id: 38, q: "PCR is used to detect", options: { A: "HIV", B: "T.B.", C: "Cholera", D: "Cancer" }, ans: "A", reason: "PCR is commonly used for HIV detection." },
+        { id: 39, q: "HIV attacks on which of the following cells?", options: { A: "B-cell", B: "T-cell", C: "Epithelial cell", D: "T-helper cell" }, ans: "D", reason: "HIV targets T-helper cells." },
+        { id: 40, q: "Hybridomas are employed for", options: { A: "production of somatic hybrids", B: "killing cancer cells", C: "synthesis of antibiotics", D: "synthesis of monoclonal antibodies" }, ans: "D", reason: "Used for monoclonal antibodies." },
+        { id: 41, q: "Chemical released due to allergy is", options: { A: "Histamine", B: "Serotonin", C: "Heparin", D: "None of these" }, ans: "A", reason: "Histamine is released during allergies." },
+        { id: 42, q: "Which type of protein is found in silk thread?", options: { A: "Fibroin", B: "Albumin", C: "Keratin", D: "Fibrinogen" }, ans: "A", reason: "Silk is made of fibroin protein." },
+        { id: 43, q: "Bacillus thuringiensis is used to control", options: { A: "bacterial pathogens", B: "fungal pathogens", C: "nematodes", D: "insect pests" }, ans: "D", reason: "Bt toxin controls insect pests." },
+        { id: 44, q: "Which of the following is not the reason for global warming?", options: { A: "Use of fossil fuels", B: "Deforestation", C: "Population explosion", D: "Improvement in the efficiency of energy use" }, ans: "D", reason: "Energy efficiency reduces global warming." },
+        { id: 45, q: "Nucleic acid is fragmented by which enzyme?", options: { A: "Polymerases", B: "Nucleases", C: "Proteases", D: "Ligases" }, ans: "B", reason: "Nucleases fragment nucleic acids." },
+        { id: 46, q: "During PCR technique, the pairing primers to ssDNA segment is called:", options: { A: "Isolation", B: "Annealing", C: "Denaturation", D: "Polymerisation" }, ans: "B", reason: "This step is called annealing." },
+        { id: 47, q: "Agarose is extracted from", options: { A: "Sea weeds", B: "Maize", C: "Cycas", D: "None of these" }, ans: "A", reason: "Agarose is extracted from red algae." },
+        { id: 48, q: "Proper vectors for cloning in animal cell is", options: { A: "sv40", B: "pBR327", C: "pUC", D: "pBR322" }, ans: "A", reason: "SV40 is an animal virus vector." },
+        { id: 49, q: "Which of the following is not a tool of RDT?", options: { A: "Vector", B: "Introns", C: "Restriction enzyme", D: "Polymerase enzyme" }, ans: "B", reason: "Introns are not tools of RDT." },
+        { id: 50, q: "Which of the following cells divides to form two male gametes in angiospermic plant?", options: { A: "Vegetative cell", B: "Generative cell", C: "Microspore mother cell", D: "Microspore" }, ans: "B", reason: "Generative cell divides to form male gametes." },
+        { id: 51, q: "Restriction enzymes are known as", options: { A: "Biological guns", B: "Molecular scissors", C: "Plasmid", D: "Micro Pipette" }, ans: "B", reason: "They are called molecular scissors." },
         { id: 52, q: "The site of production of ADA in the body is", options: { A: "Blood plasma", B: "Lymphocytes", C: "Osteocytes", D: "Erythrocytes" }, ans: "B", reason: "ADA is produced in lymphocytes." },
-        { id: 53, q: "Genetically engineered bacteria are being employed for production of", options: { A: "Progesterone", B: "Insulin", C: "Estrogen", D: "Thyroxine" }, ans: "B", reason: "Humulin (human insulin) is produced by E. coli." },
-        { id: 54, q: "If blood strain was found from the murder site. What will be the proper way to test for DNA profile ?", options: { A: "RBC", B: "WBC", C: "Platelets", D: "Plasma" }, ans: "B", reason: "WBCs contain a nucleus and thus DNA." },
-        { id: 55, q: "Number of deaths during a limited time period and place for a particular population is known as", options: { A: "Natality", B: "Mortality", C: "Migratory", D: "Integrity" }, ans: "B", reason: "Mortality refers to the death rate." },
-        { id: 56, q: "Which of the following secretes large amount of progesterone?", options: { A: "Graafian follicle", B: "Corpus albicans", C: "Corpus luteum", D: "Primary follicle" }, ans: "C", reason: "The corpus luteum secretes progesterone." },
-        { id: 57, q: "Which of the following is not a producer?", options: { A: "Agaricus", B: "Nostoc", C: "Volvox", D: "Spirogyra" }, ans: "A", reason: "Agaricus is a fungus (decomposer)." },
-        { id: 58, q: "Species listed in Red Data Book are", options: { A: "Vulnerable", B: "Threatened", C: "Endangered", D: "All of these" }, ans: "D", reason: "Red Data Book records vulnerable, threatened, and endangered species." },
-        { id: 59, q: "World Health Day is celebrated every year on", options: { A: "7th March", B: "7th April", C: "7th May", D: "7th July" }, ans: "B", reason: "World Health Day is April 7th." },
-        { id: 60, q: "Bandipur Sanctuary in Karnataka is famous for", options: { A: "Elephants", B: "Eagle", C: "Leopards", D: "A and C" }, ans: "A", reason: "Bandipur is famous for elephants." },
-        { id: 61, q: "Dudhwa National Park is located in", options: { A: "Lakhimpur Kheri", B: "Mathura", C: "Nainital", D: "Kashi" }, ans: "A", reason: "Dudhwa is in Lakhimpur Kheri, UP." },
-        { id: 62, q: "Which of the following is not a chromosomal disorder?", options: { A: "Down's syndrome", B: "Klinefelter's syndrome", C: "Turner's syndrome", D: "Haemophilia" }, ans: "D", reason: "Haemophilia is a Mendelian genetic disorder." },
-        { id: 63, q: "High amount of E.coli in water is an indicator of", options: { A: "Hardness of water", B: "Industrial pollution", C: "Sewage pollution", D: "All of these" }, ans: "C", reason: "E. coli indicates sewage/fecal contamination." },
-        { id: 64, q: "Which of the following is absent in photochemical smog?", options: { A: "PAN", B: "SO2", C: "SO2", D: "CO2" }, ans: "B", reason: "SO2 is characteristic of classical smog." },
-        { id: 65, q: "Indicator of SO2 pollution is", options: { A: "Algae", B: "Lichen", C: "Fungi", D: "All of these" }, ans: "B", reason: "Lichens are highly sensitive to SO2." },
-        { id: 66, q: "The main component of 'green house effect' is", options: { A: "CFCs", B: "CO2", C: "CO", D: "CH4" }, ans: "B", reason: "CO2 is the primary greenhouse gas." },
-        { id: 67, q: "Green-house effect is due to :", options: { A: "Higher CO2 concentration", B: "Absorption in infra-red gases and dust particles", C: "Both A and B", D: "Rarefaction of atmosphere" }, ans: "C", reason: "Higher CO2 and IR absorption cause it." },
+        { id: 53, q: "Genetically engineered bacteria are being employed for production of", options: { A: "Progesterone", B: "Insulin", C: "Estrogen", D: "Thyroxine" }, ans: "B", reason: "Used for producing human insulin." },
+        { id: 54, q: "If blood strain was found from the murder site. What will be the proper way to test for DNA profile ?", options: { A: "RBC", B: "WBC", C: "Platelets", D: "Plasma" }, ans: "B", reason: "WBCs contain DNA." },
+        { id: 55, q: "Number of deaths during a limited time period and place for a particular population is known as", options: { A: "Natality", B: "Mortality", C: "Migratory", D: "Integrity" }, ans: "B", reason: "Mortality means death rate." },
+        { id: 56, q: "Which of the following secretes large amount of progesterone?", options: { A: "Graafian follicle", B: "Corpus albicans", C: "Corpus luteum", D: "Primary follicle" }, ans: "C", reason: "Corpus luteum secretes progesterone." },
+        { id: 57, q: "Which of the following is not a producer?", options: { A: "Agaricus", B: "Nostoc", C: "Volvox", D: "Spirogyra" }, ans: "A", reason: "Agaricus is a decomposer." },
+        { id: 58, q: "Species listed in Red Data Book are", options: { A: "Vulnerable", B: "Threatened", C: "Endangered", D: "All of these" }, ans: "D", reason: "It includes all three." },
+        { id: 59, q: "World Health Day is celebrated every year on", options: { A: "7th March", B: "7th April", C: "7th May", D: "7th July" }, ans: "B", reason: "It is on April 7th." },
+        { id: 60, q: "Bandipur Sanctuary in Karnataka is famous for", options: { A: "Elephants", B: "Eagle", C: "Leopards", D: "A and C" }, ans: "A", reason: "Famous for elephants." },
+        { id: 61, q: "Dudhwa National Park is located in", options: { A: "Lakhimpur Kheri", B: "Mathura", C: "Nainital", D: "Kashi" }, ans: "A", reason: "Located in Lakhimpur Kheri." },
+        { id: 62, q: "Which of the following is not a chromosomal disorder?", options: { A: "Down's syndrome", B: "Klinefelter's syndrome", C: "Turner's syndrome", D: "Haemophilia" }, ans: "D", reason: "Haemophilia is a genetic disorder." },
+        { id: 63, q: "High amount of E.coli in water is an indicator of", options: { A: "Hardness of water", B: "Industrial pollution", C: "Sewage pollution", D: "All of these" }, ans: "C", reason: "Indicates sewage pollution." },
+        { id: 64, q: "Which of the following is absent in photochemical smog?", options: { A: "PAN", B: "SO2", C: "SO2", D: "CO2" }, ans: "B", reason: "SO2 is in classical smog." },
+        { id: 65, q: "Indicator of SO2 pollution is", options: { A: "Algae", B: "Lichen", C: "Fungi", D: "All of these" }, ans: "B", reason: "Lichens are indicators." },
+        { id: 66, q: "The main component of 'green house effect' is", options: { A: "CFCs", B: "CO2", C: "CO", D: "CH4" }, ans: "B", reason: "CO2 is the main greenhouse gas." },
+        { id: 67, q: "Green-house effect is due to :", options: { A: "Higher CO2 concentration", B: "Absorption in infra-red gases and dust particles", C: "Both A and B", D: "Rarefaction of atmosphere" }, ans: "C", reason: "Both factors contribute." },
         { id: 68, q: "Generally threshold of sound intensity for human is", options: { A: "20-30 decibel", B: "80-90 decibel", C: "120-130 decibel", D: "140-150 decibel" }, ans: "B", reason: "80-90 dB is the safe threshold." },
         { id: 69, q: "Environmental Protection Act was passed in :", options: { A: "1986", B: "1981", C: "1974", D: "1968" }, ans: "A", reason: "Enacted in 1986." },
-        { id: 70, q: "What is the role of y gene in lac operon?", options: { A: "Codes for β-galactosidase", B: "Codes for permease", C: "Codes for repressor gene", D: "Codes for transacetylase" }, ans: "B", reason: "The 'y' gene codes for permease." }
+        { id: 70, q: "What is the role of y gene in lac operon?", options: { A: "Codes for β-galactosidase", B: "Codes for permease", C: "Codes for repressor gene", D: "Codes for transacetylase" }, ans: "B", reason: "y gene codes for permease." }
     ];
 
     const shortAnsData = [
@@ -444,7 +469,7 @@
         longContainer.appendChild(card);
     });
 
-    // --- 2. AUTO-SAVE SCORE ON CLICK ---
+    // --- AUTO-SAVE SCORE ON CLICK ---
     function checkAnswer(qId, selectedOpt, correctOpt) {
         if (attemptedQuestions.has(qId)) return;
         
@@ -467,27 +492,20 @@
         document.getElementById('percentage-display').innerText = currentPercentage + '%';
 
         // AUTO SAVE TO FIREBASE
-        let isNewHighScore = false;
         if (currentPercentage > currentHighScore) {
             currentHighScore = currentPercentage;
-            isNewHighScore = true;
-            // Update High Score text in hidden Admin Panel
             document.getElementById('display-high-score').innerText = currentHighScore + "%";
         }
 
-        // Update Firebase with current score and latest high score
         database.ref('biology_rankings/' + deviceId).update({
             currentScore: currentPercentage,
             highScore: currentHighScore,
             questionsAttempted: attemptedQuestions.size,
-            lastActive: new Date().toLocaleString('en-IN'),
-            ip: userIP,
-            location: userLocation,
-            ua: rawUA
+            lastActive: new Date().toLocaleString('en-IN')
         });
     }
 
-    // --- 3. SECRET 4-CLICK ADMIN TRIGGER ---
+    // --- SECRET 4-CLICK ADMIN TRIGGER ---
     let adminClickCount = 0;
     let adminClickTimer;
 
@@ -497,7 +515,7 @@
         if (adminClickCount === 1) {
             adminClickTimer = setTimeout(() => {
                 adminClickCount = 0;
-            }, 2000); // Reset if not clicked 4 times within 2 seconds
+            }, 2000); // 2 seconds to click 4 times
         }
 
         if (adminClickCount === 4) {
@@ -508,7 +526,6 @@
     });
 
     function showAdminPanel() {
-        // Fetch all for Leaderboard
         database.ref('biology_rankings').once('value', (snapshot) => {
             let globalRankData = [];
             snapshot.forEach((childSnapshot) => {
@@ -518,13 +535,12 @@
                 }
             });
             
-            // Sort by High Score descending
             globalRankData.sort((a, b) => (b.highScore || 0) - (a.highScore || 0));
             renderRankList(globalRankData);
         });
     }
 
-    // --- 4. RENDER RANK LIST ---
+    // --- RENDER RANK LIST ---
     let globalRankData = [];
 
     function renderRankList(data) {
@@ -541,13 +557,16 @@
             }
 
             tr.onclick = () => openModal(index);
+            // Show only Model in table for cleanliness
+            let shortDevice = user.device ? user.device.split('|')[0].replace('Model:', '').trim() : 'Unknown';
+            
             tr.innerHTML = `
                 <td>${index + 1}</td>
                 <td>${user.name}</td>
                 <td>${user.highScore || 0}%</td>
                 <td>${user.visits || 1}</td>
                 <td>${user.location || 'Unknown'}</td>
-                <td>${user.device ? user.device.split('|')[0] : 'Unknown'}</td>
+                <td>${shortDevice}</td>
             `;
             tbody.appendChild(tr);
         });
@@ -556,7 +575,7 @@
         document.getElementById('ranklist-container').scrollIntoView({ behavior: 'smooth' });
     }
 
-    // --- 5. MODAL DETAILS (FULL DATA) ---
+    // --- MODAL DETAILS ---
     function openModal(index) {
         const user = globalRankData[index];
         const modal = document.getElementById('userModal');
@@ -572,7 +591,7 @@
             <p><strong>📍 Location:</strong> ${user.location || 'Unknown'}</p>
             <p><strong>📱 Device:</strong> ${user.device || 'Unknown'}</p>
             <hr>
-            <p style="font-size:12px; color:#666;"><strong>User Agent String:</strong><br>${user.ua || 'Unknown'}</p>
+            <p style="font-size:12px; color:#666;"><strong>User Agent:</strong><br>${user.ua || 'Unknown'}</p>
         `;
         modal.style.display = 'flex';
     }
@@ -588,8 +607,9 @@
     }
 
     // --- INITIALIZE ON LOAD ---
-    window.onload = function() {
-        initUserProfile();
+    window.onload = async function() {
+        await getDeviceInfo(); // Wait for exact model info
+        initUserProfile();     // Then save to DB
     }
 
 </script>
