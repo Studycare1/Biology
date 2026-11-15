@@ -38,26 +38,6 @@
 
         .header-info { text-align: center; font-weight: bold; margin-bottom: 20px; color: var(--secondary); }
 
-        /* Profile Card */
-        .profile-card {
-            background: #e8f4f8;
-            border: 1px solid #bce8f1;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .profile-card div { font-size: 15px; }
-        .profile-card strong { color: var(--primary); }
-        .edit-btn {
-            background: #3498db; color: white; border: none; padding: 5px 10px; 
-            border-radius: 4px; cursor: pointer; font-size: 12px; margin-left: 10px;
-        }
-
         /* MCQ Styles */
         .question-card {
             background: #fafafa; border: 1px solid #ddd; border-radius: 8px;
@@ -81,19 +61,32 @@
             border-left: 4px solid #ffc107; border-radius: 4px; font-size: 14px; color: #856404;
         }
 
-        /* Live Results Box */
+        /* Live Results Box (Now fixed at bottom of questions, not sticky) */
         #results {
             display: block; text-align: center; font-size: 20px; font-weight: bold;
-            margin-top: 20px; padding: 20px; background: #e8f4f8;
+            margin-top: 30px; padding: 20px; background: #e8f4f8;
             border-radius: 8px; border-left: 5px solid var(--primary);
-            position: sticky; bottom: 10px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 100;
         }
 
-        /* Rank List */
+        /* Admin Panel Container */
         #ranklist-container {
             display: none; margin-top: 30px; padding: 20px; background: #fff;
             border-radius: 8px; border: 2px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.05); overflow-x: auto;
         }
+        
+        /* Profile Card inside Admin Panel */
+        .profile-card {
+            background: #e8f4f8; border: 1px solid #bce8f1; border-radius: 8px;
+            padding: 15px; margin-bottom: 20px; display: flex;
+            justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+        }
+        .profile-card div { font-size: 15px; }
+        .profile-card strong { color: var(--primary); }
+        .edit-btn {
+            background: #3498db; color: white; border: none; padding: 5px 10px; 
+            border-radius: 4px; cursor: pointer; font-size: 12px; margin-left: 10px;
+        }
+
         table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; font-size: 13px; }
         th, td { padding: 10px; text-align: center; border-bottom: 1px solid #ddd; }
         th { background-color: var(--primary); color: white; }
@@ -130,21 +123,9 @@
 <body>
 
 <div class="container">
-    <!-- Click this heading 5 times for Admin Panel -->
-    <h1 id="admin-trigger">BIOLOGY MODEL PAPER</h1>
+    <!-- Click this heading 4 times for Admin Panel -->
+    <h1 id="admin-trigger" title="Click me 4 times">BIOLOGY MODEL PAPER</h1>
     
-    <div class="profile-card" id="auto-profile-card" style="display: none;">
-        <div>
-            <strong>👤 Profile:</strong> <span id="display-user-name"></span> 
-            <button class="edit-btn" onclick="editName()">Edit Name</button><br>
-            <strong>🆔 Device ID:</strong> <span id="display-device-id" style="font-size: 12px; color: #666;"></span><br>
-            <strong>👁️ Visits:</strong> <span id="display-visits">0</span>
-        </div>
-        <div>
-            <strong>🏆 Your High Score:</strong> <span id="display-high-score" style="color: #e74c3c; font-size: 18px;">0%</span>
-        </div>
-    </div>
-
     <div class="header-info">
         Time: 3 Hours + 15 Minutes | Total Marks: 70
     </div>
@@ -152,6 +133,7 @@
     <h2>SECTION - A : Objective Type Questions</h2>
     <div id="mcq-container"></div>
 
+    <!-- Live Score Tab moved below 70 questions -->
     <div id="results">
         <p>Questions Attempted: <span id="attempted-display">0</span> / 70</p>
         <p>Correct Answers: <span id="score-display">0</span></p>
@@ -159,15 +141,30 @@
         <p style="font-size: 14px; font-weight: normal; color: #27ae60; margin-top: 10px;">✓ Your score is auto-saving in the background.</p>
     </div>
 
+    <!-- Secret Admin Panel (Hidden by default) -->
     <div id="ranklist-container">
         <h3>🕵️ Secret Admin Panel - Live Student Data</h3>
-        <p style="text-align:center; font-size:12px; color:#666;">(Click on any user row to view their full device & browser details)</p>
+        
+        <!-- User's own profile info shown here -->
+        <div class="profile-card">
+            <div>
+                <strong>👤 Profile:</strong> <span id="display-user-name"></span> 
+                <button class="edit-btn" onclick="editName()">Edit Name</button><br>
+                <strong>🆔 Device ID:</strong> <span id="display-device-id" style="font-size: 12px; color: #666;"></span><br>
+                <strong>👁️ Visits:</strong> <span id="display-visits">0</span>
+            </div>
+            <div>
+                <strong>🏆 Your High Score:</strong> <span id="display-high-score" style="color: #e74c3c; font-size: 18px;">0%</span>
+            </div>
+        </div>
+
+        <p style="text-align:center; font-size:12px; color:#666;">(Click on any user row below to view their full device & browser details)</p>
         <table>
             <thead>
                 <tr>
                     <th>Rank</th>
                     <th>Student Name</th>
-                    <th>Score</th>
+                    <th>High Score</th>
                     <th>Visits</th>
                     <th>Location</th>
                     <th>Device</th>
@@ -240,6 +237,7 @@
         deviceId = localStorage.getItem('studycare_device_id');
         
         if (!deviceId) {
+            // Generate Device ID
             const nav = window.navigator;
             const screen = window.screen;
             let fingerprint = nav.userAgent + nav.language + screen.colorDepth + screen.width + screen.height + new Date().getTimezoneOffset();
@@ -258,8 +256,7 @@
             currentStudentName = localStorage.getItem('studycare_user_name') || "Student_Unknown";
         }
 
-        // Show Profile UI
-        document.getElementById('auto-profile-card').style.display = 'flex';
+        // Update UI inside Admin Panel (hidden by default)
         document.getElementById('display-user-name').innerText = currentStudentName;
         document.getElementById('display-device-id').innerText = deviceId;
 
@@ -270,12 +267,10 @@
             let data = snapshot.val();
             
             if (data) {
-                // Returning User
                 currentVisits = (data.visits || 0) + 1;
                 currentHighScore = data.highScore || 0;
                 document.getElementById('display-high-score').innerText = currentHighScore + "%";
             } else {
-                // New User
                 currentVisits = 1;
                 currentHighScore = 0;
             }
@@ -471,11 +466,12 @@
         document.getElementById('score-display').innerText = score;
         document.getElementById('percentage-display').innerText = currentPercentage + '%';
 
-        // AUTO SAVE TO FIREBASE (Silently in background)
+        // AUTO SAVE TO FIREBASE
         let isNewHighScore = false;
         if (currentPercentage > currentHighScore) {
             currentHighScore = currentPercentage;
             isNewHighScore = true;
+            // Update High Score text in hidden Admin Panel
             document.getElementById('display-high-score').innerText = currentHighScore + "%";
         }
 
@@ -491,7 +487,7 @@
         });
     }
 
-    // --- 3. SECRET 5-CLICK ADMIN TRIGGER ---
+    // --- 3. SECRET 4-CLICK ADMIN TRIGGER ---
     let adminClickCount = 0;
     let adminClickTimer;
 
@@ -499,13 +495,12 @@
         adminClickCount++;
         
         if (adminClickCount === 1) {
-            // Reset count if no 5 clicks within 3 seconds
             adminClickTimer = setTimeout(() => {
                 adminClickCount = 0;
-            }, 3000); 
+            }, 2000); // Reset if not clicked 4 times within 2 seconds
         }
 
-        if (adminClickCount === 5) {
+        if (adminClickCount === 4) {
             clearTimeout(adminClickTimer);
             adminClickCount = 0;
             showAdminPanel();
@@ -518,7 +513,7 @@
             let globalRankData = [];
             snapshot.forEach((childSnapshot) => {
                 let data = childSnapshot.val();
-                if(data.name) { // Ensure it's a valid record
+                if(data.name) {
                     globalRankData.push(data);
                 }
             });
@@ -541,7 +536,6 @@
             const tr = document.createElement('tr');
             tr.className = 'rank-row';
             
-            // Highlight if it's the current user's device
             if (user.name === currentStudentName) {
                 tr.classList.add('is-current');
             }
@@ -577,7 +571,6 @@
             <p><strong>🌐 IP Address:</strong> ${user.ip || 'Hidden'}</p>
             <p><strong>📍 Location:</strong> ${user.location || 'Unknown'}</p>
             <p><strong>📱 Device:</strong> ${user.device || 'Unknown'}</p>
-            <p><strong>🆔 Device ID:</strong> ${index}</p> <!-- Assuming index is map key from DB, but we didn't store key. Let's just show details -->
             <hr>
             <p style="font-size:12px; color:#666;"><strong>User Agent String:</strong><br>${user.ua || 'Unknown'}</p>
         `;
